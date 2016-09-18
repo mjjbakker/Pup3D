@@ -20,20 +20,20 @@ extension SCNNode {
         get {
             var min = SCNVector3(0, 0, 0)
             var max = SCNVector3(0, 0, 0)
-            getBoundingBoxMin(&min, max: &max)
+            __getBoundingBoxMin(&min, max: &max)
             return (min, max)
         }
     }
 }
 
 extension CAAnimation {
-    class func animationWithSceneNamed(name: String) -> CAAnimation? {
+    class func animationWithSceneNamed(_ name: String) -> CAAnimation? {
         var animation: CAAnimation?
         if let scene = SCNScene(named: name) {
-            scene.rootNode.enumerateChildNodesUsingBlock({ (child, stop) in
+            scene.rootNode.enumerateChildNodes({ (child, stop) in
                 if child.animationKeys.count > 0 {
-                    animation = child.animationForKey(child.animationKeys.first!)
-                    stop.initialize(true)
+                    animation = child.animation(forKey: child.animationKeys.first!)
+                    stop.initialize(to: true)
                 }
             })
         }

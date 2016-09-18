@@ -1,142 +1,198 @@
 //
 //  SMGameSimulation.swift
-//  HopHop3D
+//  Pup3D
 //
-//  Created by Martijn Bakker on 24/06/15.
-//  Copyright (c) 2015 SydneyMae. All rights reserved.
+//  Created by Martijn Bakker on 14/09/2016.
+//  Copyright © 2016 SydneyMae. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import QuartzCore
 import SceneKit
+import CoreMotion
+import SpriteKit
 
-enum DogAnimation : Int{
-    case idle
-    case run
-    //    case runRight
-    case turn
-    case jumpStart
-    case jump
-    case jumpEnd
-}
+// Collision bit masks
+let BitmaskMainCharacter    = 1 << 1
+let BitmaskGround           = 1 << 2
+let BitmaskCollision        = 1 << 3
+let BitmaskCollectable      = 1 << 4
+let BitmaskEnemy            = 1 << 5
 
-class SMGameSimulation {
+
+class SMGameSimulation : SCNScene, SCNSceneRendererDelegate ,SCNPhysicsContactDelegate{
+    
+    var mainCharacter: SMMainCharacter!
+    var mainCharacterNode: SCNNode!
+    
+    var gameLevel : SMGameLevel!
+    var levelNode : SCNNode!
+    
+    var motionManager: CMMotionManager!    
     
     
-    var mainCharacter:SCNNode!
-    var spotLightNode: SCNNode!
-    var rotate: SCNMatrix4!
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    var rotation: SCNVector4!
+    override init() {
+        super.init()
+        
+//        init game level class
+        gameLevel = SMGameLevel()
+        
+//        load level
+        levelNode = gameLevel.createWorld()
+        self.rootNode.addChildNode(levelNode)
+        
+//        setup collision details of all the level nodes
+        self.levelCollision()
+     
+        self.setupAccelerometer()
+     
+//        set physicsworld delegate and gravity
+        self.physicsWorld.contactDelegate = self
+        self.physicsWorld.gravity = SCNVector3Make(0, -9.8, 0)
     
-    var moveAcc: SCNAction!
-    var rotateAcc: SCNAction!
+//        setup collision and catergory bitmasks for individual nodes
+//        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "craneNode")
+//        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "trashNode")
+        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "trafficLightNode")
+        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "lampPostNode")
+        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "wallNode")
+        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "gateNode")
+        self.setCategoryBitmask(BitmaskCollision, andCollisionBitmask: BitmaskMainCharacter, forNode: "benchNode")
+
+    }
     
-    var inRunAnimation: Bool! = false
+    class func loadNodeWithName(nodeName:String?, fromSceneNamed: String) -> SCNNode{
+        let sceneName = SCNScene(named: fromSceneNamed)
+        var node = sceneName?.rootNode
+        
+        if (nodeName != nil) {
+            node = node?.childNode(withName: nodeName!, recursively: true)
+        } else {
+            node = node?.childNodes[0];
+        }
+        
+        
+        return node!
+    }
     
-    var rig : SMAnimatedCharacter!
     
-    func makeMainCharacterNode() -> SCNNode {
-//        func makeMainCharacterNode(scene:SCNScene){
     
-        let characterScene = SCNScene(named: "art.scnassets/mainCharacter.scn")!
-        let characterNode = characterScene.rootNode.childNodeWithName("mainCharacterGroup", recursively: true)
-        mainCharacter = SMAnimatedCharacter(characterNode: characterNode!)
-//        mainCharacter = SCNNode()
-        mainCharacter = characterNode
+    
+    
+    
+    
+    func levelCollision(){
+        //        simplified version, in final version enumerate over all the childnodes of "levelgroup" and assign each node it's own convexhull physicsShapeType for a more detailed collision mesh. Enumerate over nodes, place them in an array and "for-loop" the array to add the collisionshape
+        let level = levelNode!.childNode(withName: "levelGroup", recursively: true)
+        //        set to convexhull when method described above is implemented
+        level?.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(node: level!, options: [SCNPhysicsShape.Option.type:SCNPhysicsShape.ShapeType.concavePolyhedron]))
+        
+        level?.physicsBody?.categoryBitMask = BitmaskGround
+    }
+    
+    
+    
+    func setCategoryBitmask(_ category:Int, andCollisionBitmask collision:Int, forNode node:String){
+        let node = levelNode!.childNode(withName: node, recursively: true)
+        node?.physicsBody?.collisionBitMask = collision
+        node?.physicsBody?.categoryBitMask = category
+    }
+    
+    func renderer(_ aRenderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: TimeInterval) {
+        
+        gameLevel.setCharacterAltitude()
+        
+        //        if _gameState == GameState.inGame{
+        //            println("inGame")
+        //        }else if _gameState == GameState.paused{
+        //            println("paused")
+        //        }else if _gameState == GameState.preGame{
+        //            println("pregame")
+        //        }
+        //        if _gameState == GameState.inGame{
+        
+        //        }
+        
+    }
+    
+    
+    
+        
+    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
+        
+        if contact.nodeA.physicsBody?.categoryBitMask == PhysicsCategory.bone{
+            //                _gameSimulation._boneNode.addParticleSystem(_boneParticle)
+            score += 1
+        }
+    }
+    //    private func setupCollisionNode(node: SCNNode) {
+    //        if let geometry = node.geometry {
+    //            // Collision meshes must use a concave shape for intersection correctness.
+    //            node.physicsBody = SCNPhysicsBody.staticBody()
+    //            node.physicsBody!.categoryBitMask = BitmaskCollision
+    //            node.physicsBody!.physicsShape = SCNPhysicsShape(node: node, options: [SCNPhysicsShapeTypeKey: SCNPhysicsShapeTypeConcavePolyhedron])
+    //
+    //
+    //            // Temporary workaround because concave shape created from geometry instead of node fails
+    //            let childNode = SCNNode()
+    //            node.addChildNode(childNode)
+    //            childNode.hidden = true
+    //            childNode.geometry = node.geometry
+    //            node.geometry = nil
+    //            node.hidden = false
+    //
+    //            if node.name == "water" {
+    //                node.physicsBody!.categoryBitMask = BitmaskWater
+    //            }
+    //        }
+    //
+    //        for childNode in node.childNodes {
+    //            if childNode.hidden == false {
+    //                setupCollisionNode(childNode)
+    //            }
+    //        }
+    //    }
+
+    func setupAccelerometer(){
+        //setup motionmanager
+        motionManager = CMMotionManager()
+        if motionManager.isAccelerometerAvailable{
+            motionManager.accelerometerUpdateInterval = 1/60.0
+            motionManager.startAccelerometerUpdates(to: OperationQueue()){
+                (data, error) in
                 
-        // Collisions are handled by the physics engine. The character is approximated by
-        // a capsule that is configured to collide with collectables, enemies and walls
-        
-        let (min, max) = mainCharacter.boundingBox
-        let collisionCapsuleRadius = CGFloat(max.x - min.x) * 0.4
-        let collisionCapsuleHeight = CGFloat(max.y - min.y)
-
-        let characterCollisionNode = SCNNode()
-        characterCollisionNode.name = "collider"
-        characterCollisionNode.position = SCNVector3(0, collisionCapsuleHeight /** 0.51*/, 0) // a bit too high so that the capsule does not hit the floor
-        characterCollisionNode.physicsBody = SCNPhysicsBody(type: .Dynamic, shape:SCNPhysicsShape(geometry: SCNCapsule(capRadius: collisionCapsuleRadius, height: collisionCapsuleHeight), options:nil))
-        characterCollisionNode.physicsBody?.categoryBitMask = BitmaskMainCharacter
-        characterCollisionNode.physicsBody!.contactTestBitMask = BitmaskCollectable | BitmaskCollision | BitmaskEnemy
-        characterCollisionNode.physicsBody?.angularVelocityFactor = SCNVector3Make(0, 0, 0)
-        characterCollisionNode.physicsBody?.collisionBitMask = BitmaskCollision
-        //characterCollisionNode.physicsBody?.affectedByGravity = false
-        
-        mainCharacter.addChildNode(characterCollisionNode)
-        mainCharacter.castsShadow = true
-        mainCharacter.name = "mainCharacter"
-        
-        rig = SMAnimatedCharacter(characterNode: mainCharacter)
-        
-        setupRunAnimation()
-        
-        return mainCharacter
-    }
-    
-    func controlCharacterAltitude(scene:SCNScene){
-        var groundAltitude:Float = 0
-        let position = mainCharacter.position
-        var p0 = position
-        var p1 = position
-        
-        let maxRise = SCNFloat(1.08)
-        let maxJump = SCNFloat(10.0)
-        p0.y -= maxJump
-        p1.y += maxRise
-        
-        
-        let results = scene.physicsWorld.rayTestWithSegmentFromPoint(p1, toPoint: p0, options: [SCNPhysicsTestCollisionBitMaskKey : BitmaskGround , SCNPhysicsTestSearchModeKey: SCNPhysicsTestSearchModeClosest])
-        let result = results[0]
-        groundAltitude = result.worldCoordinates.y
-        
-        mainCharacter.position.y = groundAltitude + Float(0.5)
-    }
-    
-    func keyForAnimationType(animType : DogAnimation ) -> String{
-        switch (animType){
-        case .idle:
-            return "idle-1"
-        case .run:
-            return "mainCharacterRun-1"
-        case .turn:
-            return "turn-1"
-        case .jumpStart:
-            return "jumpStart-1"
-        case .jumpEnd:
-            return "jumpEnd-1"
-        case .jump:
-            return "jump-1"
-            
-        }
-    }
-        
-    func setupRunAnimation(){
-        let runAnimation : CAAnimation? = rig.loadAndCacheAnimation("art.scnassets/mainCharacterRun", name: keyForAnimationType(DogAnimation.run), key: keyForAnimationType(DogAnimation.run))
-        
-        if runAnimation != nil{
-            runAnimation?.repeatCount = FLT_MAX
-            runAnimation?.fadeInDuration = 0.15
-            runAnimation?.fadeOutDuration = 0.15
-        }
-    }
-        
-    func setInRunAnimation(runAnimState: Bool){
-//        print("setInRunAnim called")
-        if inRunAnimation == runAnimState{
-            return
-        }
-        inRunAnimation = runAnimState
-        
-        if (inRunAnimation == true){
-            let runKey = keyForAnimationType(DogAnimation.run)
-//            let idleKey = keyForAnimationType(DogAnimation.idle)
-            let runAnim = rig.cachedAnimationForKey(runKey)
-//            mainSkeleton.removeAnimationForKey(idleKey, fadeOutDuration: 0.15)
-            rig.mainSkeleton.addAnimation(runAnim, forKey: runKey)
-        }
-        else{
-            let runKey = keyForAnimationType(DogAnimation.run)
-            rig.mainSkeleton.removeAnimationForKey(runKey, fadeOutDuration: 0.15)
-            inRunAnimation = false
+                let threshold = 0.20
+                
+                //move right
+                if data!.acceleration.y < -threshold{
+                    
+                    let direction = -(CGFloat(data!.acceleration.y) * CGFloat(M_PI*(1/64)))
+                    
+                    self.gameLevel.mainCharacter.rotateCharacter(direction: direction)
+                    
+                    self.gameLevel.mainCharacter.running = true
+                    
+                }
+                    //move left
+                else if data!.acceleration.y > threshold{
+                    
+                    let direction = -(CGFloat(data!.acceleration.y) * CGFloat(M_PI*(1/64)))
+                    self.gameLevel.mainCharacter.rotateCharacter(direction: direction)
+                    
+                    self.gameLevel.mainCharacter.running = true
+                    
+                }
+                else{
+                    self.gameLevel.mainCharacter.running = false
+//                    self.rotate = SCNAction.rotate(by: 0, around: SCNVector3Make(0, 0, 0), duration: 1/60)
+                    self.gameLevel.mainCharacter.rotateCharacter(direction: 0)
+                }
+            }
         }
     }
 }

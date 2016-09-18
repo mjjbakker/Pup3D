@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="16A320" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="8k9-ai-Uxc">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="MyriadPro-Bold.otf">
+            <string>MyriadPro-Bold</string>
+        </array>
+    </customFonts>
+    <scenes>
+        <!--Menu View Controller-->
+        <scene sceneID="yLy-Rg-RM4">
+            <objects>
+                <viewController id="8k9-ai-Uxc" userLabel="Menu View Controller" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="DAl-XO-F56"/>
+                        <viewControllerLayoutGuide type="bottom" id="A8b-33-xAD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="xiq-CU-6CP">
+                        <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="menuBackground" translatesAutoresizingMaskIntoConstraints="NO" id="BsW-p9-rfp"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="menuLogo" translatesAutoresizingMaskIntoConstraints="NO" id="gcb-aa-sbv"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fhy-gZ-ccr">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="140" id="vmf-Gz-nbR"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="MyriadPro-Bold" family="Myriad Pro" pointSize="30"/>
+                                <size key="titleShadowOffset" width="1" height="0.0"/>
+                                <state key="normal" title="play">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleShadowColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <segue destination="BV1-FR-VrT" kind="presentation" animates="NO" modalTransitionStyle="crossDissolve" id="Kag-1g-gdV"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="BsW-p9-rfp" secondAttribute="trailing" id="87s-Lf-qA6"/>
+                            <constraint firstAttribute="bottom" secondItem="gcb-aa-sbv" secondAttribute="bottom" id="Nri-aT-fm1"/>
+                            <constraint firstItem="gcb-aa-sbv" firstAttribute="top" secondItem="xiq-CU-6CP" secondAttribute="top" id="OzV-TF-krd"/>
+                            <constraint firstItem="BsW-p9-rfp" firstAttribute="top" secondItem="xiq-CU-6CP" secondAttribute="top" id="R1J-WQ-ZkX"/>
+                            <constraint firstItem="A8b-33-xAD" firstAttribute="top" secondItem="fhy-gZ-ccr" secondAttribute="bottom" constant="45" id="UTB-9k-gxE"/>
+                            <constraint firstItem="fhy-gZ-ccr" firstAttribute="centerX" secondItem="BsW-p9-rfp" secondAttribute="centerX" id="fbs-yU-LRJ"/>
+                            <constraint firstAttribute="bottom" secondItem="fhy-gZ-ccr" secondAttribute="bottom" constant="271" id="occ-YU-L8b"/>
+                            <constraint firstItem="gcb-aa-sbv" firstAttribute="leading" secondItem="xiq-CU-6CP" secondAttribute="leading" id="yAI-co-cMT"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="occ-YU-L8b"/>
+                            </mask>
+                        </variation>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="awj-E4-UPB" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-517.6911544227886" y="144.80000000000001"/>
+        </scene>
+        <!--Game View Controller-->
+        <scene sceneID="tXr-a1-R10">
+            <objects>
+                <viewController id="BV1-FR-VrT" customClass="SMGameViewController" customModule="Pup3D" customModuleProvider="target" sceneMemberID="viewController">
+                    <sceneKitView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" playing="YES" wantsMultisampling="YES" preferredRenderingAPI="2" id="lq2-qb-JoF" customClass="SMGameView" customModule="Pup3D" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </sceneKitView>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="275" y="145"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="menuBackground" width="667" height="375"/>
+        <image name="menuLogo" width="667" height="375"/>
+    </resources>
+</document>

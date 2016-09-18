@@ -17,12 +17,12 @@ class SMPreGameState : SKNode {
     
     init(frameSize: CGSize){
         super.init()
-        self.position = CGPointMake(frameSize.width * 0.5, frameSize.height * 0.15)
-        self.userInteractionEnabled = true
+        self.position = CGPoint(x: frameSize.width * 0.5, y: frameSize.height * 0.15)
+        self.isUserInteractionEnabled = true
         
 //        self._gameLogo = SKSpriteNode(imageNamed: "art.scnassets/artwork/gameLogo.png")
         _preGameText = SMIngameScene.labelWithText("tap to start", textSize: 24)
-        _preGameText.horizontalAlignmentMode = .Center
+        _preGameText.horizontalAlignmentMode = .center
         _preGameText.position = CGPoint(x: frameSize.width/2, y: frameSize.height/5)
         
         
@@ -45,8 +45,8 @@ class SMPreGameState : SKNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func touchUpAtPoint(point point:CGPoint){
-        self.hidden = true
+    func touchUpAtPoint(point:CGPoint){
+        self.isHidden = true
 //        SMGameViewController.sharedInstance.setGameState(GameState.inGame)
     }
 }

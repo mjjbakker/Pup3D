@@ -22,16 +22,16 @@ class SMPauseGameState : SKNode{
     init(frameSize : CGSize){
         super.init()
         _pauseLabel = SMIngameScene.labelWithText("game paused", textSize: 36)
-        _pauseLabel.position = CGPointMake((frameSize.width/2) - 20, (frameSize.height/2) + 80)
+        _pauseLabel.position = CGPoint(x: (frameSize.width/2) - 20, y: (frameSize.height/2) + 80)
         
         _scoreLabel = SMIngameScene.labelWithText("Score", textSize: 24)
-        _scoreLabel.position = CGPointMake((frameSize.width/2) - 20, (frameSize.height/2))
+        _scoreLabel.position = CGPoint(x: (frameSize.width/2) - 20, y: (frameSize.height/2))
         
         _timeLabel = SMIngameScene.labelWithText("Time", textSize: 24)
-        _timeLabel.position = CGPointMake((frameSize.width/2) - 20, (frameSize.height/2) - 40)
+        _timeLabel.position = CGPoint(x: (frameSize.width/2) - 20, y: (frameSize.height/2) - 40)
         
         _tapLabel = SMIngameScene.labelWithText("tap to continue", textSize: 18)
-        _tapLabel.position = CGPointMake((frameSize.width/2) - 20, (frameSize.height/2) - 120)
+        _tapLabel.position = CGPoint(x: (frameSize.width/2) - 20, y: (frameSize.height/2) - 120)
         
         self.addChild(_pauseLabel)
         self.addChild(_scoreLabel)
@@ -44,9 +44,9 @@ class SMPauseGameState : SKNode{
         fatalError("init(coder:) has not been implemented")
     }
     
-    func touchUpAtPoint(point point:CGPoint){
+    func touchUpAtPoint(point:CGPoint){
 //        println("touch up paused called")
-        self.hidden = true
+        self.isHidden = true
 //        SMGameViewController.sharedInstance.setGameState(GameState.inGame)
     }
     
